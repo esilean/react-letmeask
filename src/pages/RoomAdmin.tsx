@@ -10,6 +10,9 @@ import { database } from "../services/firebase";
 
 import logoImg from "../assets/images/logo.svg";
 import deleteImg from "../assets/images/delete.svg";
+import checkImg from '../assets/images/check.svg'
+import answerImg from '../assets/images/answer.svg'
+
 import "../styles/room.scss";
 
 Modal.setAppElement("#root");
@@ -40,6 +43,22 @@ export function RoomAdmin() {
   async function handleDeleteQuestion() {
     await database.ref(`rooms/${roomId}/questions/${questionId}`).remove();
     closeModal();
+  }
+
+  async function handleQuestionHighlighted(questionId: string) {
+    const questionDatabase = database.ref(`rooms/${roomId}/questions/${questionId}`);
+    const question = (await questionDatabase.get()).val();
+    await questionDatabase.update({
+      isHighlighted: (!question.isHighlighted),
+    });
+  }
+
+  async function handleQuestionAsAnswered(questionId: string) {
+    const questionDatabase = database.ref(`rooms/${roomId}/questions/${questionId}`);
+    const question = (await questionDatabase.get()).val();
+    await questionDatabase.update({
+      isAnswered: (!question.isAnswered),
+    });
   }
 
   async function handleEndRoom() {
@@ -75,10 +94,23 @@ export function RoomAdmin() {
 
           <div className="questions-list">
             {questions.map((q, i) => (
-              <Question key={q.id} content={q.content} author={q.author}>
+              <Question 
+                key={q.id} 
+                content={q.content} 
+                author={q.author} 
+                isAnswered={q.isAnswered}
+                isHighlighted={q.isHighlighted}
+              >
+                <button type="button" onClick={() => handleQuestionAsAnswered(q.id)}>
+                  <img src={checkImg} alt="Marcar como Respondida" />
+                </button>
+                {!q.isAnswered &&                 <button type="button" onClick={() => handleQuestionHighlighted(q.id)}>
+                  <img src={answerImg} alt="Marcar como Destaque" />
+                </button>}
                 <button type="button" onClick={() => openModal(q.id)}>
                   <img src={deleteImg} alt="Excluir Pergunta" />
                 </button>
+              
               </Question>
             ))}
           </div>

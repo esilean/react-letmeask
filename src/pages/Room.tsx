@@ -106,7 +106,13 @@ export function Room() {
 
         <div className="questions-list">
           {questions.map((q, i) => (
-            <Question key={q.id} content={q.content} author={q.author}>
+            <Question 
+                key={q.id} 
+                content={q.content} 
+                author={q.author} 
+                isAnswered={q.isAnswered}
+                isHighlighted={q.isHighlighted}
+            >
               <button
                 className={`like-button ${q.likeId ? "liked" : ""}`}
                 type="button"
